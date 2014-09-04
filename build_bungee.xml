@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<!DOCTYPE project>
+<project default="main">
+    <include file="build_bungee_base.xml"/>
+
+    <property name="server.path" value="${server.path}"/>
+
+    <target name="main" depends="base.compile, base.setversion, base.compress, deploy"/>
+    <target name="full" depends="base.full"/>
+
+    <target name="deploy">
+        <copy todir="${server.path}/plugins" file="out/${jarname}" overwrite="true"/>
+    </target>
+</project>

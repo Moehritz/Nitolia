@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<!DOCTYPE project>
+<project name="base">
+    <property environment="env"/>
+    <property file="build.properties"/>
+
+    <path id="classpath">
+        <fileset dir="lib" erroronmissingdir="false"/>
+        <fileset dir="dependencies" erroronmissingdir="false"/>
+    </path>
+
+    <target name="full" depends="clean, unjar, compile, setversion, compress"/>
+
+    <target name="clean">
+        <delete dir="bin" failonerror="false"/>
+        <delete dir="out" failonerror="false"/>
+        <mkdir dir="bin"/>
+        <mkdir dir="out"/>
+    </target>
+
+    <target name="unjar">
+        <unjar dest="bin">
+            <fileset dir="lib" includes="*.jar" erroronmissingdir="false"/>
+            <!--<file file="C:\Users\Moehritz\Documents\Timolia-Server\Spigot02\spigot.jar"/>
+            <file file="C:\Users\Moehritz\Documents\Timolia-Server\Spigot02\plugins\worldedit-5.6.2.jar"/>
+            <file file="C:\Users\Moehritz\Documents\Timolia-Server\Spigot02\plugins\worldguard-5.9.jar"/>-->
+        </unjar>
+    </target>
+
+    <target name="getversion">
+        <tstamp/>
+        <condition property="build.number" value="${build.number}" else="dev-${DSTAMP}${TSTAMP}-${user.name}">
+            <isset property="build.number"/>
+        </condition>
+        <condition property="build.vcs.number.bonobo" value="${build.vcs.number.bonobo}" else="dev">
+            <isset property="build.vcs.number.bonobo"/>
+        </condition>
+    </target>
+
+    <target name="setversion" depends="compile" if="plugin.yml">
+        <replace file="bin/plugin.yml" token="$VERSION$" value="${build.number}" failonnoreplacements="false"/>
+        <replace file="bin/plugin.yml" token="$MAINCLASS$" value="${mainclass}" failonnoreplacements="false"/>
+    </target>
+
+    <target name="compile" depends="getversion">
+        <javac srcdir="src" destdir="bin" debug="on" debuglevel="lines,vars,source" classpathref="classpath"
+               includeantruntime="false">
+            <compilerarg line="-encoding utf-8"/>
+        </javac>
+        <copyfile src="resources/plugin.yml" dest="bin/plugin.yml" forceoverwrite="true"/>
+        <copyfile src="resources/config.yml" dest="bin/config.yml" forceoverwrite="true"/>
+    </target>
+
+    <target name="compress" depends="getversion">
+        <tstamp/>
+        <jar destfile="out/${jarname}" basedir="bin">
+            <manifest>
+                <attribute name="Main-Class" value="${mainclass}"/>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Built-Date" value="${TODAY}"/>
+                <attribute name="Version" value="${build.number}"/>
+                <attribute name="Revision" value="${build.vcs.number.bonobo}"/>
+            </manifest>
+        </jar>
+    </target>
+</project>

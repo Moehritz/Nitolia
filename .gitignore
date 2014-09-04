@@ -1,0 +1,5 @@
+bin/
+lib/
+dependencies/lombok.jar
+out/
+dependencies/
